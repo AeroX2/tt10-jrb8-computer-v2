@@ -1,0 +1,165 @@
+var paddle1_y = 0
+var paddle2_y = 0
+
+var ball_x = 0
+var ball_y = 0
+var ball_moving_up = 0
+var ball_moving_left = 0
+
+var spi_out = 0
+
+// func send_byte(data, dc) {
+    // if (dc) {
+        // spi_out = 0b100
+    // } else {
+        // spi_out = 0
+    // }
+
+    // for (var bit = 7; bit >= 0; bit -= 1) {
+        // if ((data >> bit) & 1) {
+            // spi_out |= 0b010
+        // } else {
+            // spi_out &= ~0b010
+        // }
+        // out = spi_out
+
+        // spi_out |= 0b001
+        // out = spi_out
+
+        // spi_out &= ~0b001
+        // out = spi_out
+    // }
+// }
+
+while (true) {
+    spi_out += 5;
+    for (var y_strip = 0; y_strip < 8; y_strip += 1) {
+        for (var x = 0; x < 128; x += 1) {
+            var pixels = 0
+            if (x < 8) {
+                for (var i = 0; i < 8; i += 1) {
+                    var y = y_strip * 8 + i
+                    if (y >= paddle1_y && y < paddle1_y + 16) {
+                        if (i == 0) pixels = pixels | 1
+                        if (i == 1) pixels = pixels | 2
+                        if (i == 2) pixels = pixels | 4
+                        if (i == 3) pixels = pixels | 8
+                        if (i == 4) pixels = pixels | 16
+                        if (i == 5) pixels = pixels | 32
+                        if (i == 6) pixels = pixels | 64
+                        if (i == 7) pixels = pixels | 128
+                    }
+                }
+            }
+
+            if (x >= 120) {
+                for (var i = 0; i < 8; i += 1) {
+                    var y = y_strip * 8 + i
+                    if (y >= paddle2_y && y < paddle2_y + 16) {
+                        if (i == 0) pixels = pixels | 1
+                        if (i == 1) pixels = pixels | 2
+                        if (i == 2) pixels = pixels | 4
+                        if (i == 3) pixels = pixels | 8
+                        if (i == 4) pixels = pixels | 16
+                        if (i == 5) pixels = pixels | 32
+                        if (i == 6) pixels = pixels | 64
+                        if (i == 7) pixels = pixels | 128
+                    }
+                }
+            }
+
+            if (x >= ball_x && x < ball_x + 4) {
+                for (var i = 0; i < 8; i += 1) {
+                    var y = y_strip * 8 + i
+                    if (y >= ball_y && y < ball_y + 4) {
+                        if (i == 0) pixels = pixels | 1
+                        if (i == 1) pixels = pixels | 2
+                        if (i == 2) pixels = pixels | 4
+                        if (i == 3) pixels = pixels | 8
+                        if (i == 4) pixels = pixels | 16
+                        if (i == 5) pixels = pixels | 32
+                        if (i == 6) pixels = pixels | 64
+                        if (i == 7) pixels = pixels | 128
+                    }
+                }
+            }
+
+            out 0
+            out 1
+            out 0
+
+            // if (1) {
+                // spi_out = 4
+            // } else {
+                // spi_out = 0
+            // }
+
+            // for (var bit = 7; bit >= 0; bit -= 1) {
+                // var mask = 1
+                // if (bit == 1) mask = 2
+                // if (bit == 2) mask = 4
+                // if (bit == 3) mask = 8
+                // if (bit == 4) mask = 16
+                // if (bit == 5) mask = 32
+                // if (bit == 6) mask = 64
+                // if (bit == 7) mask = 128
+                // if (pixels & mask) {
+                    // spi_out = spi_out | 2
+                // } else {
+                    // spi_out = spi_out & 5
+                // }
+                // out spi_out
+
+                // spi_out = spi_out | 1
+                // out spi_out
+
+                // spi_out = spi_out & 6
+                // out spi_out
+            // }
+        }
+    }
+
+    if (ball_moving_left) {
+        ball_x -= 5
+    } else {
+        ball_x += 5
+    }
+
+    if (ball_moving_up) {
+        ball_y -= 5
+    } else {
+        ball_y += 5
+    }
+
+    if (ball_x < 0) {
+        ball_moving_left = 0
+    } else if (ball_x > 124) {
+        ball_moving_left = 1
+    }
+    if (ball_y < 0) {
+        ball_moving_up = 0
+    } else if (ball_y > 60) {
+        ball_moving_up = 1
+    }
+
+    var inp = in
+    if (inp & 0b01 == 0b01) {
+        if (paddle1_y > 0) {
+            paddle1_y -= 2
+        }
+    } else if (inp & 0b10 == 0b10) {
+        if (paddle1_y < 48) {
+            paddle1_y += 2
+        }
+    }
+
+    if (inp & 0b0100 == 0b0100) {
+        if (paddle2_y > 0) {
+            paddle2_y -= 2
+        }
+    } else if (inp & 8 == 8) {
+        if (paddle2_y < 48) {
+            paddle2_y += 2
+        }
+    }
+}
