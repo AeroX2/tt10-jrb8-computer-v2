@@ -9,7 +9,7 @@ module alu (
     // Inputs
     input [15:0] a,
     input [15:0] b,
-    input [7:0] cins,
+    input [7:0] ir,
     input oe,
     input carryin,
 
@@ -17,22 +17,26 @@ module alu (
     output logic carryout,
     output [15:0] aluout,
     output overout,
-    output cmpo
+    output cmpo,
+    output enable_flags
 );
   localparam CLR_CMP_INS = 'h50;
+  // TODO(This needs to be filled in)
+  localparam FLAGS_OFF_INS = 'h54;
+  localparam FLAGS_ON_INS = 'h53;
   localparam CARRY_OFF_INS = 'h51;
   localparam CARRY_ON_INS = 'h52;
   localparam SIGN_OFF_INS = 'h53;
   localparam SIGN_ON_INS = 'h54;
 
-  reg [9:0] alu_rom[0:255];
+  reg [10:0] alu_rom[0:255];
   initial begin
     $readmemh("../rom/alu_rom.mem", alu_rom);
   end
 
   logic done_reg;
 
-  logic [9:0] val;
+  logic [10:0] val;
   wire za = val[0];
   wire ia = val[1];
   wire zb = val[2];
@@ -41,7 +45,7 @@ module alu (
   wire po = val[5];
   wire high = val[6];
   wire cmp = val[7];
-  wire [1:0] cselect = val[9:8];
+  wire [2:0] cselect = val[10:8];
 
   logic [15:0] aandz;
   logic [15:0] bandz;
@@ -50,11 +54,12 @@ module alu (
   logic [15:0] xorb;
 
   logic [16:0] full_sum;
-  logic [15:0] muxoutput;
 
-  logic [31:0] mult;
-  logic [15:0] mult_a, mult_b;
-  logic [4:0] mult_count;
+  logic [16:0] mult;
+  logic [15:0] partial_products [0:3];
+  logic [31:0] shifted_products [0:3];
+
+  logic [15:0] muxoutput;
 
   wire carried = carry_mode && carryin;
 
@@ -65,19 +70,21 @@ module alu (
     XORZ,
     SUM,
     AND,
-    MULT_INIT,
-    MULT_CALC,
+    LEFT_SHIFT,
+    RIGHT_SHIFT,
+    MULT,
     DIV,
     INVERT
   } State;
 
   State state, next_state;
-  logic carry_mode, signed_mode;
+  logic flags_mode, carry_mode, signed_mode;
   always_ff @(posedge clk, posedge rst) begin
     if (rst) begin
       state <= IDLE;
 
       done_reg <= 1;
+      flags_mode <= 1;
       carry_mode <= 0;
       signed_mode <= 0;
 
@@ -94,23 +101,29 @@ module alu (
       state <= next_state;
       case (state)
         IDLE: begin
-          if (cins == CARRY_OFF_INS) begin
+          if (ir == FLAGS_OFF_INS) begin
+            done_reg <= ~done_reg;
+            flags_mode <= 0;
+          end else if (ir == FLAGS_ON_INS) begin
+            done_reg <= ~done_reg;
+            flags_mode <= 1;
+          end else if (ir == CARRY_OFF_INS) begin
             done_reg <= ~done_reg;
             carry_mode <= 0;
-          end else if (cins == CARRY_ON_INS) begin
+          end else if (ir == CARRY_ON_INS) begin
             done_reg <= ~done_reg;
             carry_mode <= 1;
-          end else if (cins == SIGN_OFF_INS) begin
+          end else if (ir == SIGN_OFF_INS) begin
             done_reg <= ~done_reg;
             signed_mode <= 0;
-          end else if (cins == SIGN_ON_INS) begin
+          end else if (ir == SIGN_ON_INS) begin
             done_reg <= ~done_reg;
             signed_mode <= 1;
           end else if (start) done_reg <= 0;
           else done_reg <= 1;
         end
         DECODE: begin
-          val <= alu_rom[cins];
+          val <= alu_rom[ir];
         end
         ANDZ: begin
           aandz <= za ? 0 : a;
@@ -126,38 +139,25 @@ module alu (
         AND: begin
           muxoutput <= xora & xorb;
         end
+        LEFT_SHIFT: begin
+          muxoutput <= xora << xorb;
+        end
+        RIGHT_SHIFT: begin
+          muxoutput <= xora >> xorb;
+        end
         MULT: begin
-          MULT_INIT: begin
-            mult_a <= xora;
-            mult_b <= xorb;
-            mult_count <= 0;
-            mult <= 0;
-            next_state = MULT_CALC;
-          end
-          MULT_CALC: begin
-            if (mult_count < 16) begin
-              if (mult_b[mult_count]) begin
-                mult <= mult + (mult_a << mult_count);
-              end
-              mult_count <= mult_count + 1;
-              next_state = MULT_CALC;
-            end else begin
-              muxoutput <= high ? mult[31:16] : mult[15:0];
-              next_state = INVERT;
-            end
-          end
+          // TODO: Multiplication
+          // mult <= shifted_products[0] + shifted_products[1] + shifted_products[2] + shifted_products[3];
+          next_state = INVERT;
         end
         DIV: begin
-          if (signed_mode) begin
-            muxoutput <= $signed(xora) / $signed((xorb == 16'h0 ? 16'h1 : xorb));
-          end else begin
-            muxoutput <= xora / (xorb == 16'h0 ? 16'h1 : xorb);
-          end
+          // TODO: Division
+          next_state = INVERT;
         end
         INVERT: begin
-          muxoutput <= muxoutput ^ {16{io}};
+          next_state = IDLE;
         end
-      endcase
+    endcase
     end
   end
 
@@ -165,7 +165,11 @@ module alu (
     done = done_reg;
     next_state = IDLE;
 
-    mult = signed_mode ? $signed(xora) * $signed(xorb) : xora * xorb;
+    // for (int i = 0; i < 4; i++) begin
+    //   partial_products[i] = mult_b[i*4 +: 4] ? mult_a << (i*4) : 16'h0;
+    //   shifted_products[i] = {16'h0, partial_products[i]} << (i*4);
+    // end
+
     full_sum = xora + xorb + {15'b0, po} + {15'b0, (carry_mode && cmp) ? carried : 1'b0};
 
     case (state)
@@ -183,8 +187,10 @@ module alu (
         case (cselect)
           0: next_state = SUM;
           1: next_state = AND;
-          2: next_state = MULT_INIT;
-          3: next_state = DIV;
+          2: next_state = LEFT_SHIFT;
+          3: next_state = RIGHT_SHIFT;
+          4: next_state = MULT;
+          5: next_state = DIV;
         endcase
       end
       SUM: begin
@@ -193,15 +199,8 @@ module alu (
       AND: begin
         next_state = INVERT;
       end
-      MULT_INIT: begin
-        next_state = MULT_CALC;
-      end
-      MULT_CALC: begin
-        if (mult_count < 16) begin
-          next_state = MULT_CALC;
-        end else begin
-          next_state = INVERT;
-        end
+      MULT: begin
+        next_state = INVERT;
       end
       DIV: begin
         next_state = INVERT;
@@ -213,7 +212,8 @@ module alu (
   end
 
   assign aluout = oe ? muxoutput : 0;
-  assign cmpo = (cmp || cins == CLR_CMP_INS) && state == INVERT;
+  assign cmpo = (cmp || ir == CLR_CMP_INS) && state == INVERT;
+  assign enable_flags = flags_mode;
 
   assign carryout = cselect == 0 ? (((ia | ib) & po) ? !full_sum[16] : full_sum[16]) : 0;
   assign overout = ((~muxoutput[15]) & xora[15] & xorb[15]) | (muxoutput[15] & ~xora[15] & ~xorb[15]);

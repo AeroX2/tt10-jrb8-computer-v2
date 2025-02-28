@@ -1,7 +1,9 @@
+`default_nettype none
+
 module jmp (
-    input [7:0] cins,
-    input [7:0] databus,
-    input [15:0] pcin,
+    input [7:0] ir,
+    input [15:0] databus,
+    input [22:0] pcin,
     input clk,
     input rst,
     input zflag,
@@ -11,7 +13,7 @@ module jmp (
     input oe,
     input highbits_we,
     output pcoe,
-    output [15:0] pcout
+    output [22:0] pcout
 );
   reg [4:0] jmp_rom[0:255];
 
@@ -19,7 +21,7 @@ module jmp (
     $readmemh("../rom/jmp_rom.mem", jmp_rom);
   end
 
-  wire [4:0] val = jmp_rom[cins];
+  wire [4:0] val = jmp_rom[ir];
 
   wire eq = zflag;
   wire neq = !zflag;
@@ -57,15 +59,15 @@ module jmp (
 
   assign pcoe = oe ? flags[sel] : 0;
 
-  reg [7:0] highbits;
+  reg [15:0] highbits;
   always_ff @(posedge clk, posedge rst) begin
     if (rst) highbits <= 0;
     else if (highbits_we) highbits <= databus;
   end
 
-  wire [15:0] two_byte_address = {highbits, databus};
-  wire [15:0] pcadd = pcin + two_byte_address;
+  wire [22:0] address = {highbits, databus};
+  wire [22:0] relative_pc_address = pcin + address;
 
-  wire [15:0] muxoutput = val[4] ? pcadd : two_byte_address;
+  wire [22:0] muxoutput = val[4] ? relative_pc_address : address;
   assign pcout = pcoe ? muxoutput : 0;
 endmodule

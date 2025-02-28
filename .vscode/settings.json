@@ -1,4 +1,9 @@
 {
-  "verilog.linting.linter": "verilator",
-  "verilog.formatting.verilogHDL.formatter": "verible-verilog-format"
+  "verilog.linting.linter": "iverilog",
+  "verilog.formatting.verilogHDL.formatter": "verible-verilog-format",
+  "verilog.linting.iverilog.arguments": "",
+  "verilog.linting.iverilog.includePath": [
+    "**/*.sv"
+  ],
+  "verilog.linting.iverilog.runAtFileLocation": true
 }

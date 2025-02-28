@@ -1,3 +1,5 @@
+`default_nettype none
+
 module cu (
     input clk,
     input rst,
@@ -5,22 +7,22 @@ module cu (
     input alu_done,
     output logic alu_executing,
 
-    input [7:0] irin,
+    input [9:0] irin,
+    output logic [ 7:0] ir,
 
     input pcinflag,
-    input [15:0] pcin,
-    output logic [15:0] pc,
+    input [22:0] pcin,
+    output logic [22:0] pc,
     output logic write_en,
     output logic highbits_we,
 
-    output logic [ 9:0] input_flags,
-    output logic [11:0] output_flags,
-    output logic [ 7:0] cuout
+    output logic [11:0] input_flags,
+    output logic [19:0] output_flags
 );
 
-  logic [6:0] cu_rom[0:255];
-  logic [6:0] cu_rom_2[0:255];
-  logic [21:0] cu_flag_conv[0:87];
+  logic [5:0] cu_rom[0:255];
+  logic [5:0] cu_rom_2[0:255];
+  logic [21:0] cu_flag_conv[0:87]; // TODO
   initial begin
     $readmemh("../rom/cu_rom.mem", cu_rom);
     $readmemh("../rom/cu_rom_2.mem", cu_rom_2);
@@ -40,22 +42,23 @@ module cu (
 
   State cu_state, cu_next_state;
 
-  logic [7:0] ir_reg;
-  logic [15:0] pc_reg;
+  logic [9:0] ir_reg;
+  logic [22:0] pc_reg;
 
-  logic [21:0] flags;
+  logic [26:0] flags;
 
   wire halt = flags[21];
+  wire another_cycle = flags[22];
 
   // PCC, RAMI, ROMO, RAMO
   wire pcc = flags[20];
   wire rom_or_ram_state_change = pcc ||
-						flags[13] || 
-						flags[9] ||
-						flags[10];
+						flags[17] || 
+						flags[13] ||
+						flags[14];
 
-  // AO, BO, CO, DO
-  wire aluo = flags[1] || flags[2] || flags[3] || flags[4];
+  // AO, BO, CO, DO, EO, FO, GO, HO
+  wire aluo = flags[1] || flags[2] || flags[3] || flags[4] || flags[5] || flags[6] || flags[7] || flags[8];
 
   logic alu_done_reg;
 
@@ -107,7 +110,8 @@ module cu (
         end else cu_next_state = FLAGS_1_ALU;
       end
       FLAGS_1_EVENTS: begin
-        cu_next_state = FLAGS_2;
+        if (another_cycle) cu_next_state = UPDATE_IR;
+        else cu_next_state = FLAGS_2;
       end
       FLAGS_2: begin
         if (aluo) cu_next_state = FLAGS_2_ALU;
@@ -129,12 +133,12 @@ module cu (
     case (cu_state)
       // Turn on PCC and ROMO
       UPDATE_IR: begin
-        flags = 'b100000000001000000000;
+        flags = 26'b01000000000010000000000000;
       end
-      FLAGS_1, FLAGS_1_ALU, FLAGS_1_SPI, FLAGS_1_EVENTS: begin
+      FLAGS_1, FLAGS_1_ALU, FLAGS_1_EVENTS: begin
         flags = cu_flag_conv[cu_rom[ir_reg]];
       end
-      FLAGS_2, FLAGS_2_ALU, FLAGS_2_SPI, FLAGS_2_EVENTS: begin
+      FLAGS_2, FLAGS_2_ALU, FLAGS_2_EVENTS: begin
         flags = cu_flag_conv[cu_rom_2[ir_reg]];
       end
 
@@ -148,5 +152,5 @@ module cu (
   assign pc = pc_reg;
   assign write_en = cu_state == FLAGS_1_EVENTS || cu_state == FLAGS_2_EVENTS;
   assign highbits_we = cu_state == FLAGS_1_EVENTS;
-  assign cuout = ir_reg;
+  assign ir = ir_reg;
 endmodule

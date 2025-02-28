@@ -1,3 +1,5 @@
+`default_nettype none
+
 module cmp (
     input [15:0] cmpin,
     input we,
