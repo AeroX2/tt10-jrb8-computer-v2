@@ -15,12 +15,14 @@ project:
   
   # List your project's source files here. Source files must be in ./src and you must list each source file separately, one per line:
   source_files:        
+    - "tt_um_aerox2_jrb16_computer.sv"
+    - "consts.sv"
     - "alu.sv"
     - "cmp.sv"
     - "cu.sv"
     - "jmp.sv"
     - "qspi.sv"
-    - "tt_um_aerox2_jrb16_computer.sv"
+    - "registers.sv"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
