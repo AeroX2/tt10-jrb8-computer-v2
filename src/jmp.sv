@@ -1,7 +1,7 @@
 `default_nettype none
 
 module jmp (
-    input [7:0] ir,
+    input [9:0] ir,
     input [15:0] databus,
     input [22:0] pcin,
     input clk,
@@ -15,7 +15,7 @@ module jmp (
     output pcoe,
     output [22:0] pcout
 );
-  reg [4:0] jmp_rom[0:255];
+  reg [4:0] jmp_rom[1024];
 
   initial begin
     $readmemh("../rom/jmp_rom.mem", jmp_rom);

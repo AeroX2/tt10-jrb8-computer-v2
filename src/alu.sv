@@ -29,7 +29,7 @@ module alu (
   localparam SIGN_OFF_INS = 'h53;
   localparam SIGN_ON_INS = 'h54;
 
-  reg [10:0] alu_rom[0:255];
+  reg [10:0] alu_rom[0:1024];
   initial begin
     $readmemh("../rom/alu_rom.mem", alu_rom);
   end
@@ -44,7 +44,7 @@ module alu (
   wire io = val[4];
   wire po = val[5];
   wire high = val[6];
-  wire cmp = val[7];
+  wire carry = val[7];
   wire [2:0] cselect = val[10:8];
 
   logic [15:0] aandz;
@@ -54,10 +54,6 @@ module alu (
   logic [15:0] xorb;
 
   logic [16:0] full_sum;
-
-  logic [16:0] mult;
-  logic [15:0] partial_products [0:3];
-  logic [31:0] shifted_products [0:3];
 
   logic [15:0] muxoutput;
 
@@ -70,14 +66,15 @@ module alu (
     XORZ,
     SUM,
     AND,
+    XOR,
     LEFT_SHIFT,
     RIGHT_SHIFT,
     MULT,
     DIV,
     INVERT
-  } State;
+  } state_t;
 
-  State state, next_state;
+  state_t state, next_state;
   logic flags_mode, carry_mode, signed_mode;
   always_ff @(posedge clk, posedge rst) begin
     if (rst) begin
@@ -99,7 +96,7 @@ module alu (
       muxoutput <= 0;
     end else if (clk) begin
       state <= next_state;
-      case (state)
+      unique case (state)
         IDLE: begin
           if (ir == FLAGS_OFF_INS) begin
             done_reg <= ~done_reg;
@@ -139,6 +136,9 @@ module alu (
         AND: begin
           muxoutput <= xora & xorb;
         end
+        XOR: begin
+          muxoutput <= xora ^ xorb;
+        end
         LEFT_SHIFT: begin
           muxoutput <= xora << xorb;
         end
@@ -148,14 +148,11 @@ module alu (
         MULT: begin
           // TODO: Multiplication
           // mult <= shifted_products[0] + shifted_products[1] + shifted_products[2] + shifted_products[3];
-          next_state = INVERT;
         end
         DIV: begin
           // TODO: Division
-          next_state = INVERT;
         end
         INVERT: begin
-          next_state = IDLE;
         end
     endcase
     end
@@ -170,9 +167,9 @@ module alu (
     //   shifted_products[i] = {16'h0, partial_products[i]} << (i*4);
     // end
 
-    full_sum = xora + xorb + {15'b0, po} + {15'b0, (carry_mode && cmp) ? carried : 1'b0};
+    full_sum = xora + xorb + {15'b0, po} + {15'b0, (carry_mode && carry) ? carried : 1'b0};
 
-    case (state)
+    unique case (state)
       IDLE: begin
         if (start) next_state = DECODE;
         else next_state = IDLE;
@@ -184,19 +181,19 @@ module alu (
         next_state = XORZ;
       end
       XORZ: begin
-        case (cselect)
+        unique case (cselect)
           0: next_state = SUM;
-          1: next_state = AND;
-          2: next_state = LEFT_SHIFT;
-          3: next_state = RIGHT_SHIFT;
-          4: next_state = MULT;
-          5: next_state = DIV;
+          2: next_state = XOR;
+          3: next_state = LEFT_SHIFT;
+          4: next_state = RIGHT_SHIFT;
+          5: next_state = MULT;
+          6: next_state = DIV;
         endcase
       end
       SUM: begin
         next_state = INVERT;
       end
-      AND: begin
+      XOR: begin
         next_state = INVERT;
       end
       MULT: begin
@@ -212,9 +209,11 @@ module alu (
   end
 
   assign aluout = oe ? muxoutput : 0;
-  assign cmpo = (cmp || ir == CLR_CMP_INS) && state == INVERT;
+  // TODO: Is enable_flags == cmpo?
+  assign cmpo = (1 || ir == CLR_CMP_INS) && state == INVERT;
   assign enable_flags = flags_mode;
 
   assign carryout = cselect == 0 ? (((ia | ib) & po) ? !full_sum[16] : full_sum[16]) : 0;
-  assign overout = ((~muxoutput[15]) & xora[15] & xorb[15]) | (muxoutput[15] & ~xora[15] & ~xorb[15]);
+  assign overout = ((~muxoutput[15]) & xora[15] & xorb[15])
+                 | (muxoutput[15] & ~xora[15] & ~xorb[15]);
 endmodule

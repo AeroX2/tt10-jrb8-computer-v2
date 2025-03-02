@@ -1,9 +1,15 @@
 {
-  "verilog.linting.linter": "iverilog",
+  "verilog.linting.linter": "none",
   "verilog.formatting.verilogHDL.formatter": "verible-verilog-format",
   "verilog.linting.iverilog.arguments": "",
   "verilog.linting.iverilog.includePath": [
-    "**/*.sv"
+    "**/*.sv",
+    "*.sv"
   ],
-  "verilog.linting.iverilog.runAtFileLocation": true
+  "verilog.linting.iverilog.runAtFileLocation": false,
+  "verilog.lint.iverilog.enabled": true,
+  "verilog.languageServer.svls.enabled": false,
+  "verilog.languageServer.svls.path": "C:\\Users\\James\\Documents\\svls.exe",
+  "verilog.languageServer.veribleVerilogLs.path": "C:\\Users\\James\\Documents\\verible\\verible-verilog-ls",
+  "verilog.languageServer.veribleVerilogLs.enabled": true
 }

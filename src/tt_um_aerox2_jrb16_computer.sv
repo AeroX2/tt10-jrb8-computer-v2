@@ -23,10 +23,14 @@ module tt_um_aerox2_jrb16_computer (
   assign uio_oe[5] = qspi_io_oe[3];  // sd3
   assign uio_oe[6] = 1;  // cs1 ram
   assign uio_oe[7] = 0;  // unused
-  
+
   wire sclk;
   wire cs_rom = (romo || rami || ramo);
   wire cs_ram = (rami || ramo);
+
+  wire [3:0] qspi_io_out;
+  wire [3:0] qspi_io_in;
+  wire [3:0] qspi_io_oe;
 
   assign uio_out[0] = cs_rom;
   assign qspi_io_in = {uio_in[5], uio_in[4], uio_in[2], uio_in[1]};
@@ -34,10 +38,6 @@ module tt_um_aerox2_jrb16_computer (
   assign uio_out[3] = sclk;
   assign uio_out[6] = cs_ram;
   assign uio_out[7] = 0;
-  
-  wire [3:0] qspi_io_out;
-  wire [3:0] qspi_io_in;
-  wire [3:0] qspi_io_oe;
 
   wire [31:0] qspi_data;
 
@@ -58,7 +58,8 @@ module tt_um_aerox2_jrb16_computer (
       .sclk(sclk),
       .cs(cs_rom),
       .io_out(qspi_io_out),
-      .io_in(qspi_io_in)
+      .io_in(qspi_io_in),
+      .io_oe(qspi_io_oe)
   );
 
   // QSPI for RAM
@@ -109,7 +110,6 @@ module tt_um_aerox2_jrb16_computer (
   // Register file instance
   wire [15:0] read_data_a;
   wire [15:0] read_data_b;
-  wire [3:0] reg_sel;
   wire [3:0] reg_sel_a;
   wire [3:0] reg_sel_b;
   wire [15:0] write_data;
@@ -124,7 +124,6 @@ module tt_um_aerox2_jrb16_computer (
     .clk(clk),
     .rst(rst),
     .write_en(write_en),
-    .reg_sel(reg_sel),
     .reg_sel_a(reg_sel_a),
     .reg_sel_b(reg_sel_b),
     .write_data(databus),

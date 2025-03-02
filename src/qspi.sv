@@ -7,6 +7,7 @@ module qspi (
     // QSPI wiring
     output logic sclk,
     output logic cs,
+    output logic [3:0] io_oe,
     output logic [3:0] io_out,
     input [3:0] io_in,
 
@@ -32,10 +33,10 @@ module qspi (
     SEND_ADDRESS,
     SEND_DATA,
     RECEIVE_DATA
-  } State;
+  } state_t;
 
   // Registers
-  State qspi_state, qspi_next_state;
+  state_t qspi_state, qspi_next_state;
   logic [4:0]  shift_counter;
   logic        sclk_reg;
 
@@ -51,7 +52,7 @@ module qspi (
       qspi_in_reg <= 0;
     end else begin
       qspi_state <= qspi_next_state;
-      case (qspi_state)
+      unique case (qspi_state)
         IDLE: begin
           sclk_reg <= 0;
           shift_counter <= 0;
@@ -101,7 +102,7 @@ module qspi (
     qspi_next_state = IDLE;
     busy = (qspi_state != IDLE);
 
-    case (qspi_state)
+    unique case (qspi_state)
       IDLE: begin
         if (write || !write) qspi_next_state = SEND_COMMAND;
         else qspi_next_state = IDLE;
@@ -137,14 +138,20 @@ module qspi (
     sclk = sclk_reg;
     data_out = qspi_in_reg;
 
-    cs = 1;
+    io_oe = 4'b1111;
     io_out = 4'b0000;
-    if (qspi_state != IDLE) begin
-      cs = 0;
-
-      if (qspi_state != RECEIVE_DATA) begin
+    case (qspi_state)
+      IDLE: begin
+        cs = 1;
+      end
+      RECEIVE_DATA: begin
+        cs = 0;
+        io_oe = 4'b0000;
+      end
+      default: begin
+        cs = 0;
         io_out = qspi_out_reg[shift_counter[2:0] * 4 +: 4];
       end
-    end
+    endcase
   end
 endmodule

@@ -3,39 +3,38 @@
 module registers (
     input wire clk,
     input wire rst,
-    
+
     // Register select and control
     input wire write_en,
-    input wire [3:0] reg_sel,  // Which register to write to
     input wire [3:0] reg_sel_a, // First read port select
     input wire [3:0] reg_sel_b, // Second read port select
-    
+
     // Data ports
     input wire [15:0] write_data,
     output wire [15:0] read_data_a,
     output wire [15:0] read_data_b,
     output wire [15:0] databus,  // Databus output
-    
+
     // Memory access registers
     output wire [15:0] mar,
     output wire [7:0] mpage,
-    
+
     // Input/Output flags
     input wire [11:0] input_flags,
     output wire [19:0] output_flags,
-    
+
     // I/O registers
     output wire [7:0] oreg,
     output wire [7:0] ireg,
-    
+
     // ALU inputs and output
     output wire [15:0] a_alu_in,
     output wire [15:0] b_alu_in,
     input wire [15:0] aluout,
-    
+
     // QSPI data input
     input wire [31:0] qspi_data,
-    
+
     // External inputs
     input wire [7:0] ui_in
 );
@@ -67,7 +66,7 @@ module registers (
     reg [7:0] mpage_reg;
     reg [7:0] oreg_reg;
     reg [7:0] ireg_reg;
-    
+
     // Register write logic
     always @(posedge clk or posedge rst) begin
         if (rst) begin
@@ -86,7 +85,7 @@ module registers (
         end else begin
             // Update input register on every clock cycle
             ireg_reg <= ui_in;
-            
+
             if (write_en) begin
                 // General purpose registers
                 if (ai) areg <= write_data;
@@ -97,7 +96,7 @@ module registers (
                 if (fi) freg <= write_data;
                 if (gi) greg <= write_data;
                 if (hi) hreg <= write_data;
-                
+
                 // Special registers
                 if (mari) mar_reg <= write_data;
                 if (mpagei) mpage_reg <= write_data[7:0];
@@ -105,7 +104,7 @@ module registers (
             end
         end
     end
-    
+
     // Read port A output
     assign read_data_a = 
         (reg_sel_a == 4'h0) ? areg :
@@ -116,7 +115,7 @@ module registers (
         (reg_sel_a == 4'h5) ? freg :
         (reg_sel_a == 4'h6) ? greg :
         (reg_sel_a == 4'h7) ? hreg : 16'h0;
-    
+
     // Read port B output
     assign read_data_b = 
         (reg_sel_b == 4'h0) ? areg :
@@ -127,13 +126,13 @@ module registers (
         (reg_sel_b == 4'h5) ? freg :
         (reg_sel_b == 4'h6) ? greg :
         (reg_sel_b == 4'h7) ? hreg : 16'h0;
-    
+
     // Output assignments
     assign mar = mar_reg;
     assign mpage = mpage_reg;
     assign oreg = oreg_reg;
     assign ireg = ireg_reg;
-    
+
     // Output flags assignments - these control which registers are selected for operations
     assign output_flags[0] = 1'b0;  // io
     assign output_flags[1] = 1'b0;  // ao
@@ -177,7 +176,7 @@ module registers (
     wire romo = output_flags[17];
     wire ramo = output_flags[18];
     wire jmpo = output_flags[19];
-    
+
     // ALU input selection logic
     assign a_alu_in = ao ? areg :
                       bo ? breg :
@@ -187,7 +186,7 @@ module registers (
                       fo ? freg :
                       go ? greg :
                       ho ? hreg : 16'h0;
-                      
+
     assign b_alu_in = ao2 ? areg :
                       bo2 ? breg :
                       co2 ? creg :
@@ -196,10 +195,10 @@ module registers (
                       fo2 ? freg :
                       go2 ? greg :
                       ho2 ? hreg : 16'h0;
-    
+
     // Databus multiplexing logic
     wire aluo = ao | bo | co | doo | eo | fo | go | ho;
-    
+
     assign databus = aluo ? aluout :
                     (romo || ramo) ? qspi_data[15:0] :
                     io ? {8'b0, ireg_reg} :
