@@ -25,8 +25,8 @@ module tt_um_aerox2_jrb16_computer (
   assign uio_oe[7] = 0;  // unused
 
   wire sclk;
-  wire cs_rom = (romo || rami || ramo);
-  wire cs_ram = (rami || ramo);
+  wire cs_rom;
+  // wire cs_ram;
 
   wire [3:0] qspi_io_out;
   wire [3:0] qspi_io_in;
@@ -36,10 +36,12 @@ module tt_um_aerox2_jrb16_computer (
   assign qspi_io_in = {uio_in[5], uio_in[4], uio_in[2], uio_in[1]};
   assign {uio_out[5], uio_out[4], uio_out[2], uio_out[1]} = qspi_io_out;
   assign uio_out[3] = sclk;
-  assign uio_out[6] = cs_ram;
+  // assign uio_out[6] = cs_ram;
+  assign uio_out[6] = 0;
   assign uio_out[7] = 0;
 
-  wire [31:0] qspi_data;
+  wire [31:0] rom_data;
+  wire [31:0] ram_data;
 
   wire busy_rom;
   wire busy_ram;
@@ -53,7 +55,7 @@ module tt_um_aerox2_jrb16_computer (
       .write(0),
       .address(pc),
       .data_in(23'b0),
-      .data_out(qspi_data),
+      .data_out(rom_data),
       .busy(busy_rom),
       .sclk(sclk),
       .cs(cs_rom),
@@ -62,13 +64,13 @@ module tt_um_aerox2_jrb16_computer (
       .io_oe(qspi_io_oe)
   );
 
-  // QSPI for RAM
+  // wire rami = flags[RAMI_BIT];
   // qspi qspi_ram_module (
   //     .clk(clk),
   //     .rst(rst),
   //     .write(rami),
   //     .address({mpage, mar}),
-  //     .data_out(qspi_data),
+  //     .data_out(ram_data),
   //     .busy(busy_ram),
   //     .sclk(sclk),
   //     .cs(cs_ram),
@@ -82,9 +84,9 @@ module tt_um_aerox2_jrb16_computer (
   wire [22:0] pcin;
 
   // CU
-  wire [7:0] ir;
-  wire [11:0] input_flags;
-  wire [19:0] output_flags;
+  wire [FLAGS_LEN-1:0] flags;
+
+  wire [9:0] ir;
   wire write_en;
   cu cu_module (
       .clk(clk),
@@ -93,13 +95,12 @@ module tt_um_aerox2_jrb16_computer (
       .write_en(write_en),
       .alu_executing(alu_executing),
       .alu_done(alu_done),
-      .irin(qspi_data[9:0]),
+      .irin(rom_data[9:0]),
       .ir(ir),
       .pcinflag(pcinflag),
       .pcin(pcin),
       .pc(pc),
-      .input_flags(input_flags),
-      .output_flags(output_flags)
+      .flags(flags)
   );
 
   wire [15:0] mar;
@@ -107,12 +108,6 @@ module tt_um_aerox2_jrb16_computer (
   wire [7:0] oreg;
   wire [7:0] ireg;
 
-  // Register file instance
-  wire [15:0] read_data_a;
-  wire [15:0] read_data_b;
-  wire [3:0] reg_sel_a;
-  wire [3:0] reg_sel_b;
-  wire [15:0] write_data;
   assign uo_out = oreg;
 
   // Databus
@@ -123,33 +118,26 @@ module tt_um_aerox2_jrb16_computer (
   registers registers_module (
     .clk(clk),
     .rst(rst),
+    .flags(flags),
+    .ui_in(ui_in),
     .write_en(write_en),
-    .reg_sel_a(reg_sel_a),
-    .reg_sel_b(reg_sel_b),
-    .write_data(databus),
-    .read_data_a(read_data_a),
-    .read_data_b(read_data_b),
+
+    .rom(rom_data[25:10]),
+    // .ram(ram_data[]),
+    .ram(1),
+    .aluout(aluout),
     .databus(databus),
+
+    .alu_a(alu_a),
+    .alu_b(alu_b),
+
     .mar(mar),
     .mpage(mpage),
-    .input_flags(input_flags),
-    .output_flags(output_flags),
-    .oreg(oreg),
-    .ireg(ireg),
-    .a_alu_in(a_alu_in),
-    .b_alu_in(b_alu_in),
-    .aluout(aluout),
-    .qspi_data(qspi_data),
-    .ui_in(ui_in)
+    .oreg(oreg)
   );
 
-  wire romo = output_flags[17];
-  wire rami = input_flags[1];
-  wire ramo = output_flags[18];
-  wire jmpo = output_flags[19];
-
-// TODO
-  wire aluo = 1;
+  wire jmpo = flags[JMPO_BIT];
+  wire aluo = flags[ALUO_BIT];
 
   // ALU
   wire overout;
@@ -157,26 +145,24 @@ module tt_um_aerox2_jrb16_computer (
   wire cmpo;
   wire alu_executing;
   wire alu_done;
-  wire enable_flags;
 
-  wire [15:0] a_alu_in;
-  wire [15:0] b_alu_in;
+  wire [15:0] alu_a;
+  wire [15:0] alu_b;
 
   alu alu_module (
       .clk(clk),
       .rst(rst),
       .start(alu_executing),
       .done(alu_done),
-      .a(a_alu_in),
-      .b(b_alu_in),
+      .a(alu_a),
+      .b(alu_b),
       .carryin(cflag),
       .oe(aluo),
       .ir(ir),
       .aluout(aluout),
       .overout(overout),
       .carryout(carryout),
-      .cmpo(cmpo),
-      .enable_flags(enable_flags)
+      .cmpo(cmpo)
   );
 
   // CMP
@@ -194,7 +180,7 @@ module tt_um_aerox2_jrb16_computer (
       .oflag(oflag),
       .cflag(cflag),
       .sflag(sflag),
-      .we(enable_flags)
+      .we(cmpo)
   );
 
   // JMP

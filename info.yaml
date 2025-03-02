@@ -15,8 +15,8 @@ project:
   
   # List your project's source files here. Source files must be in ./src and you must list each source file separately, one per line:
   source_files:        
-    - "tt_um_aerox2_jrb16_computer.sv"
     - "consts.sv"
+    - "tt_um_aerox2_jrb16_computer.sv"
     - "alu.sv"
     - "cmp.sv"
     - "cu.sv"

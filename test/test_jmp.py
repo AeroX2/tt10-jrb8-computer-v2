@@ -6,7 +6,7 @@ from cocotb.handle import Force
 
 
 async def setup(dut):
-    jmp = dut.tt_um_aerox2_jrb8_computer.jmp_module
+    jmp = dut.tt_um_aerox2_jrb16_computer.jmp_module
     clk = jmp.clk
 
     clock = Clock(clk, 10, units="us")

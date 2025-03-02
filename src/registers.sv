@@ -4,55 +4,23 @@ module registers (
     input wire clk,
     input wire rst,
 
-    // Register select and control
+    input wire [FLAGS_LEN-1:0] flags,
+    input wire [7:0] ui_in,
     input wire write_en,
-    input wire [3:0] reg_sel_a, // First read port select
-    input wire [3:0] reg_sel_b, // Second read port select
 
-    // Data ports
-    input wire [15:0] write_data,
-    output wire [15:0] read_data_a,
-    output wire [15:0] read_data_b,
-    output wire [15:0] databus,  // Databus output
-
-    // Memory access registers
-    output wire [15:0] mar,
-    output wire [7:0] mpage,
-
-    // Input/Output flags
-    input wire [11:0] input_flags,
-    output wire [19:0] output_flags,
-
-    // I/O registers
-    output wire [7:0] oreg,
-    output wire [7:0] ireg,
-
-    // ALU inputs and output
-    output wire [15:0] a_alu_in,
-    output wire [15:0] b_alu_in,
+    input wire [15:0] rom,
+    input wire [15:0] ram,
     input wire [15:0] aluout,
+    output wire [15:0] databus,
 
-    // QSPI data input
-    input wire [31:0] qspi_data,
+    output [15:0] alu_a,
+    output [15:0] alu_b,
 
-    // External inputs
-    input wire [7:0] ui_in
+    output [15:0] mar,
+    output [7:0] mpage,
+    output [7:0] oreg,
+    output [7:0] ireg
 );
-
-    // Extract individual input flags
-    wire oi = input_flags[0];
-    wire rami = input_flags[1];
-    wire mari = input_flags[2];
-    wire mpagei = input_flags[3];
-    wire ai = input_flags[4];
-    wire bi = input_flags[5];
-    wire ci = input_flags[6];
-    wire di = input_flags[7];
-    wire ei = input_flags[8];
-    wire fi = input_flags[9];
-    wire gi = input_flags[10];
-    wire hi = input_flags[11];
-
     // Register declarations
     reg [15:0] areg;
     reg [15:0] breg;
@@ -66,6 +34,35 @@ module registers (
     reg [7:0] mpage_reg;
     reg [7:0] oreg_reg;
     reg [7:0] ireg_reg;
+
+    // Input flags
+    wire ai = flags[0];
+    wire bi = flags[1];
+    wire ci = flags[2];
+    wire di = flags[3];
+    wire ei = flags[4];
+    wire fi = flags[5];
+    wire gi = flags[6];
+    wire hi = flags[7];
+    wire rami = flags[8];
+    wire mari = flags[9];
+    wire mpagei = flags[10];
+    wire oi = flags[11];
+
+    // Output flags
+    wire ao = flags[12];
+    wire bo = flags[13];
+    wire co = flags[14];
+    wire doo = flags[15];
+    wire eo = flags[16];
+    wire fo = flags[17];
+    wire go = flags[18];
+    wire ho = flags[19];
+    wire aluo = flags[20];
+    wire romo = flags[21];
+    wire ramo = flags[22];
+    wire jmpo = flags[23];
+    wire io = flags[24];
 
     // Register write logic
     always @(posedge clk or posedge rst) begin
@@ -83,49 +80,24 @@ module registers (
             oreg_reg <= 0;
             ireg_reg <= 0;
         end else begin
-            // Update input register on every clock cycle
-            ireg_reg <= ui_in;
-
             if (write_en) begin
                 // General purpose registers
-                if (ai) areg <= write_data;
-                if (bi) breg <= write_data;
-                if (ci) creg <= write_data;
-                if (di) dreg <= write_data;
-                if (ei) ereg <= write_data;
-                if (fi) freg <= write_data;
-                if (gi) greg <= write_data;
-                if (hi) hreg <= write_data;
+                if (ai) areg <= databus;
+                if (bi) breg <= databus;
+                if (ci) creg <= databus;
+                if (di) dreg <= databus;
+                if (ei) ereg <= databus;
+                if (fi) freg <= databus;
+                if (gi) greg <= databus;
+                if (hi) hreg <= databus;
 
                 // Special registers
-                if (mari) mar_reg <= write_data;
-                if (mpagei) mpage_reg <= write_data[7:0];
-                if (oi) oreg_reg <= write_data[7:0];
+                if (mari) mar_reg <= databus;
+                if (mpagei) mpage_reg <= databus[7:0];
+                if (oi) oreg_reg <= databus[7:0];
             end
         end
     end
-
-    // Read port A output
-    assign read_data_a = 
-        (reg_sel_a == 4'h0) ? areg :
-        (reg_sel_a == 4'h1) ? breg :
-        (reg_sel_a == 4'h2) ? creg :
-        (reg_sel_a == 4'h3) ? dreg :
-        (reg_sel_a == 4'h4) ? ereg :
-        (reg_sel_a == 4'h5) ? freg :
-        (reg_sel_a == 4'h6) ? greg :
-        (reg_sel_a == 4'h7) ? hreg : 16'h0;
-
-    // Read port B output
-    assign read_data_b = 
-        (reg_sel_b == 4'h0) ? areg :
-        (reg_sel_b == 4'h1) ? breg :
-        (reg_sel_b == 4'h2) ? creg :
-        (reg_sel_b == 4'h3) ? dreg :
-        (reg_sel_b == 4'h4) ? ereg :
-        (reg_sel_b == 4'h5) ? freg :
-        (reg_sel_b == 4'h6) ? greg :
-        (reg_sel_b == 4'h7) ? hreg : 16'h0;
 
     // Output assignments
     assign mar = mar_reg;
@@ -133,52 +105,16 @@ module registers (
     assign oreg = oreg_reg;
     assign ireg = ireg_reg;
 
-    // Output flags assignments - these control which registers are selected for operations
-    assign output_flags[0] = 1'b0;  // io
-    assign output_flags[1] = 1'b0;  // ao
-    assign output_flags[2] = 1'b0;  // bo
-    assign output_flags[3] = 1'b0;  // co
-    assign output_flags[4] = 1'b0;  // doo
-    assign output_flags[5] = 1'b0;  // eo
-    assign output_flags[6] = 1'b0;  // fo
-    assign output_flags[7] = 1'b0;  // go
-    assign output_flags[8] = 1'b0;  // ho
-    assign output_flags[9] = 1'b0;  // ao2
-    assign output_flags[10] = 1'b0; // bo2
-    assign output_flags[11] = 1'b0; // co2
-    assign output_flags[12] = 1'b0; // doo2
-    assign output_flags[13] = 1'b0; // eo2
-    assign output_flags[14] = 1'b0; // fo2
-    assign output_flags[15] = 1'b0; // go2
-    assign output_flags[16] = 1'b0; // ho2
-    assign output_flags[17] = 1'b0; // romo
-    assign output_flags[18] = 1'b0; // ramo
-    assign output_flags[19] = 1'b0; // jmpo
+    assign alu_a = ai ? areg :
+                      bi ? breg :
+                      ci ? creg :
+                      di ? dreg :
+                      ei ? ereg :
+                      fi ? freg :
+                      gi ? greg :
+                      hi ? hreg : 16'h0;
 
-    // Extract individual output flags for clarity
-    wire io = output_flags[0];
-    wire ao = output_flags[1];
-    wire bo = output_flags[2];
-    wire co = output_flags[3];
-    wire doo = output_flags[4];
-    wire eo = output_flags[5];
-    wire fo = output_flags[6];
-    wire go = output_flags[7];
-    wire ho = output_flags[8];
-    wire ao2 = output_flags[9];
-    wire bo2 = output_flags[10];
-    wire co2 = output_flags[11];
-    wire doo2 = output_flags[12];
-    wire eo2 = output_flags[13];
-    wire fo2 = output_flags[14];
-    wire go2 = output_flags[15];
-    wire ho2 = output_flags[16];
-    wire romo = output_flags[17];
-    wire ramo = output_flags[18];
-    wire jmpo = output_flags[19];
-
-    // ALU input selection logic
-    assign a_alu_in = ao ? areg :
+    assign alu_b = ao ? areg :
                       bo ? breg :
                       co ? creg :
                       doo ? dreg :
@@ -187,21 +123,18 @@ module registers (
                       go ? greg :
                       ho ? hreg : 16'h0;
 
-    assign b_alu_in = ao2 ? areg :
-                      bo2 ? breg :
-                      co2 ? creg :
-                      doo2 ? dreg :
-                      eo2 ? ereg :
-                      fo2 ? freg :
-                      go2 ? greg :
-                      ho2 ? hreg : 16'h0;
-
-    // Databus multiplexing logic
-    wire aluo = ao | bo | co | doo | eo | fo | go | ho;
-
     assign databus = aluo ? aluout :
-                    (romo || ramo) ? qspi_data[15:0] :
-                    io ? {8'b0, ireg_reg} :
-                    16'h0;
+                     ao ? areg :
+                     bo ? breg :
+                     co ? creg :
+                     doo ? dreg :
+                     eo ? ereg :
+                     fo ? freg :
+                     go ? greg :
+                     ho ? hreg :
+                     romo ? rom :
+                     ramo ? ram :
+                     io ? {8'b0, ui_in} :
+                     16'h0;
 
 endmodule

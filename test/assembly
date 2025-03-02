@@ -1,0 +1,1157 @@
+	
+nop	0
+mov a b	1
+mov a c	2
+mov a d	3
+mov a e	4
+mov a f	5
+mov a g	6
+mov a h	7
+mov b a	8
+mov b c	9
+mov b d	A
+mov b e	B
+mov b f	C
+mov b g	D
+mov b h	E
+mov c a	F
+mov c b	10
+mov c d	11
+mov c e	12
+mov c f	13
+mov c g	14
+mov c h	15
+mov d a	16
+mov d b	17
+mov d c	18
+mov d e	19
+mov d f	1A
+mov d g	1B
+mov d h	1C
+mov e a	1D
+mov e b	1E
+mov e c	1F
+mov e d	20
+mov e f	21
+mov e g	22
+mov e h	23
+mov f a	24
+mov f b	25
+mov f c	26
+mov f d	27
+mov f e	28
+mov f g	29
+mov f h	2A
+mov g a	2B
+mov g b	2C
+mov g c	2D
+mov g d	2E
+mov g e	2F
+mov g f	30
+mov g h	31
+mov h a	32
+mov h b	33
+mov h c	34
+mov h d	35
+mov h e	36
+mov h f	37
+mov h g	38
+cmp a 0	39
+cmp b 0	3A
+cmp c 0	3B
+cmp d 0	3C
+cmp e 0	3D
+cmp f 0	3E
+cmp g 0	3F
+cmp h 0	40
+cmp a 1	41
+cmp b 1	42
+cmp c 1	43
+cmp d 1	44
+cmp e 1	45
+cmp f 1	46
+cmp g 1	47
+cmp h 1	48
+cmp a -1	49
+cmp b -1	4A
+cmp c -1	4B
+cmp d -1	4C
+cmp e -1	4D
+cmp f -1	4E
+cmp g -1	4F
+cmp h -1	50
+cmp a 65536	51
+cmp b 65536	52
+cmp c 65536	53
+cmp d 65536	54
+cmp e 65536	55
+cmp f 65536	56
+cmp g 65536	57
+cmp h 65536	58
+cmp a {number}	59
+cmp b {number}	5A
+cmp c {number}	5B
+cmp d {number}	5C
+cmp e {number}	5D
+cmp f {number}	5E
+cmp g {number}	5F
+cmp h {number}	60
+cmp a b	61
+cmp a c	62
+cmp a d	63
+cmp a e	64
+cmp a f	65
+cmp a g	66
+cmp a h	67
+cmp b a	68
+cmp b c	69
+cmp b d	6A
+cmp b e	6B
+cmp b f	6C
+cmp b g	6D
+cmp b h	6E
+cmp c a	6F
+cmp c b	70
+cmp c d	71
+cmp c e	72
+cmp c f	73
+cmp c g	74
+cmp c h	75
+cmp d a	76
+cmp d b	77
+cmp d c	78
+cmp d e	79
+cmp d f	7A
+cmp d g	7B
+cmp d h	7C
+cmp e a	7D
+cmp e b	7E
+cmp e c	7F
+cmp e d	80
+cmp e f	81
+cmp e g	82
+cmp e h	83
+cmp f a	84
+cmp f b	85
+cmp f c	86
+cmp f d	87
+cmp f e	88
+cmp f g	89
+cmp f h	8A
+cmp g a	8B
+cmp g b	8C
+cmp g c	8D
+cmp g d	8E
+cmp g e	8F
+cmp g f	90
+cmp g h	91
+cmp h a	92
+cmp h b	93
+cmp h c	94
+cmp h d	95
+cmp h e	96
+cmp h f	97
+cmp h g	98
+jmp {label}	99
+jmp = {label}	9A
+jmp != {label}	9B
+jmp < {label}	9C
+jmp <= {label}	9D
+jmp > {label}	9E
+jmp >= {label}	9F
+jmp .< {label}	A0
+jmp .<= {label}	A1
+jmp .> {label}	A2
+jmp .>= {label}	A3
+jmp z {number}	A4
+jmp o {number}	A5
+jmp c {number}	A6
+jmp s {number}	A7
+jmpr {number}	A8
+jmpr = {number}	A9
+jmpr != {number}	AA
+jmpr < {number}	AB
+jmpr <= {number}	AC
+jmpr > {number}	AD
+jmpr >= {number}	AE
+jmpr .< {number}	AF
+jmpr .<= {number}	B0
+jmpr .> {number}	B1
+jmpr .>= {number}	B2
+jmpr z {number}	B3
+jmpr o {number}	B4
+jmpr c {number}	B5
+jmpr s {number}	B6
+call {label}	B7
+ret	B8
+opp clr	B9
+opp flags off	BA
+opp flags on	BB
+opp carry off	BC
+opp carry on	BD
+opp sign off	BE
+opp sign on	BF
+opp 0	C0
+opp 1	C1
+opp -1	C2
+opp a	C3
+opp b	C4
+opp c	C5
+opp d	C6
+opp e	C7
+opp f	C8
+opp g	C9
+opp h	CA
+opp ~a	CB
+opp ~b	CC
+opp ~c	CD
+opp ~d	CE
+opp ~e	CF
+opp ~f	D0
+opp ~g	D1
+opp ~h	D2
+opp -a	D3
+opp -b	D4
+opp -c	D5
+opp -d	D6
+opp -e	D7
+opp -f	D8
+opp -g	D9
+opp -h	DA
+opp a+1	DB
+opp b+1	DC
+opp c+1	DD
+opp d+1	DE
+opp e+1	DF
+opp f+1	E0
+opp g+1	E1
+opp h+1	E2
+opp a-1	E3
+opp b-1	E4
+opp c-1	E5
+opp d-1	E6
+opp e-1	E7
+opp f-1	E8
+opp g-1	E9
+opp h-1	EA
+opp a+b	EB
+opp a+c	EC
+opp a+d	ED
+opp a+e	EE
+opp a+f	EF
+opp a+g	F0
+opp a+h	F1
+opp b+a	F2
+opp b+c	F3
+opp b+d	F4
+opp b+e	F5
+opp b+f	F6
+opp b+g	F7
+opp b+h	F8
+opp c+a	F9
+opp c+b	FA
+opp c+d	FB
+opp c+e	FC
+opp c+f	FD
+opp c+g	FE
+opp c+h	FF
+opp d+a	100
+opp d+b	101
+opp d+c	102
+opp d+e	103
+opp d+f	104
+opp d+g	105
+opp d+h	106
+opp e+a	107
+opp e+b	108
+opp e+c	109
+opp e+d	10A
+opp e+f	10B
+opp e+g	10C
+opp e+h	10D
+opp f+a	10E
+opp f+b	10F
+opp f+c	110
+opp f+d	111
+opp f+e	112
+opp f+g	113
+opp f+h	114
+opp g+a	115
+opp g+b	116
+opp g+c	117
+opp g+d	118
+opp g+e	119
+opp g+f	11A
+opp g+h	11B
+opp h+a	11C
+opp h+b	11D
+opp h+c	11E
+opp h+d	11F
+opp h+e	120
+opp h+f	121
+opp h+g	122
+opp a-b	123
+opp a-c	124
+opp a-d	125
+opp a-e	126
+opp a-f	127
+opp a-g	128
+opp a-h	129
+opp b-a	12A
+opp b-c	12B
+opp b-d	12C
+opp b-e	12D
+opp b-f	12E
+opp b-g	12F
+opp b-h	130
+opp c-a	131
+opp c-b	132
+opp c-d	133
+opp c-e	134
+opp c-f	135
+opp c-g	136
+opp c-h	137
+opp d-a	138
+opp d-b	139
+opp d-c	13A
+opp d-e	13B
+opp d-f	13C
+opp d-g	13D
+opp d-h	13E
+opp e-a	13F
+opp e-b	140
+opp e-c	141
+opp e-d	142
+opp e-f	143
+opp e-g	144
+opp e-h	145
+opp f-a	146
+opp f-b	147
+opp f-c	148
+opp f-d	149
+opp f-e	14A
+opp f-g	14B
+opp f-h	14C
+opp g-a	14D
+opp g-b	14E
+opp g-c	14F
+opp g-d	150
+opp g-e	151
+opp g-f	152
+opp g-h	153
+opp h-a	154
+opp h-b	155
+opp h-c	156
+opp h-d	157
+opp h-e	158
+opp h-f	159
+opp h-g	15A
+opp a&b	15B
+opp a&c	15C
+opp a&d	15D
+opp a&e	15E
+opp a&f	15F
+opp a&g	160
+opp a&h	161
+opp b&a	162
+opp b&c	163
+opp b&d	164
+opp b&e	165
+opp b&f	166
+opp b&g	167
+opp b&h	168
+opp c&a	169
+opp c&b	16A
+opp c&d	16B
+opp c&e	16C
+opp c&f	16D
+opp c&g	16E
+opp c&h	16F
+opp d&a	170
+opp d&b	171
+opp d&c	172
+opp d&e	173
+opp d&f	174
+opp d&g	175
+opp d&h	176
+opp e&a	177
+opp e&b	178
+opp e&c	179
+opp e&d	17A
+opp e&f	17B
+opp e&g	17C
+opp e&h	17D
+opp f&a	17E
+opp f&b	17F
+opp f&c	180
+opp f&d	181
+opp f&e	182
+opp f&g	183
+opp f&h	184
+opp g&a	185
+opp g&b	186
+opp g&c	187
+opp g&d	188
+opp g&e	189
+opp g&f	18A
+opp g&h	18B
+opp h&a	18C
+opp h&b	18D
+opp h&c	18E
+opp h&d	18F
+opp h&e	190
+opp h&f	191
+opp h&g	192
+opp a|b	193
+opp a|c	194
+opp a|d	195
+opp a|e	196
+opp a|f	197
+opp a|g	198
+opp a|h	199
+opp b|a	19A
+opp b|c	19B
+opp b|d	19C
+opp b|e	19D
+opp b|f	19E
+opp b|g	19F
+opp b|h	1A0
+opp c|a	1A1
+opp c|b	1A2
+opp c|d	1A3
+opp c|e	1A4
+opp c|f	1A5
+opp c|g	1A6
+opp c|h	1A7
+opp d|a	1A8
+opp d|b	1A9
+opp d|c	1AA
+opp d|e	1AB
+opp d|f	1AC
+opp d|g	1AD
+opp d|h	1AE
+opp e|a	1AF
+opp e|b	1B0
+opp e|c	1B1
+opp e|d	1B2
+opp e|f	1B3
+opp e|g	1B4
+opp e|h	1B5
+opp f|a	1B6
+opp f|b	1B7
+opp f|c	1B8
+opp f|d	1B9
+opp f|e	1BA
+opp f|g	1BB
+opp f|h	1BC
+opp g|a	1BD
+opp g|b	1BE
+opp g|c	1BF
+opp g|d	1C0
+opp g|e	1C1
+opp g|f	1C2
+opp g|h	1C3
+opp h|a	1C4
+opp h|b	1C5
+opp h|c	1C6
+opp h|d	1C7
+opp h|e	1C8
+opp h|f	1C9
+opp h|g	1CA
+opp a^b	1CB
+opp a^c	1CC
+opp a^d	1CD
+opp a^e	1CE
+opp a^f	1CF
+opp a^g	1D0
+opp a^h	1D1
+opp b^a	1D2
+opp b^c	1D3
+opp b^d	1D4
+opp b^e	1D5
+opp b^f	1D6
+opp b^g	1D7
+opp b^h	1D8
+opp c^a	1D9
+opp c^b	1DA
+opp c^d	1DB
+opp c^e	1DC
+opp c^f	1DD
+opp c^g	1DE
+opp c^h	1DF
+opp d^a	1E0
+opp d^b	1E1
+opp d^c	1E2
+opp d^e	1E3
+opp d^f	1E4
+opp d^g	1E5
+opp d^h	1E6
+opp e^a	1E7
+opp e^b	1E8
+opp e^c	1E9
+opp e^d	1EA
+opp e^f	1EB
+opp e^g	1EC
+opp e^h	1ED
+opp f^a	1EE
+opp f^b	1EF
+opp f^c	1F0
+opp f^d	1F1
+opp f^e	1F2
+opp f^g	1F3
+opp f^h	1F4
+opp g^a	1F5
+opp g^b	1F6
+opp g^c	1F7
+opp g^d	1F8
+opp g^e	1F9
+opp g^f	1FA
+opp g^h	1FB
+opp h^a	1FC
+opp h^b	1FD
+opp h^c	1FE
+opp h^d	1FF
+opp h^e	200
+opp h^f	201
+opp h^g	202
+opp a>>b	203
+opp a>>c	204
+opp a>>d	205
+opp a>>e	206
+opp a>>f	207
+opp a>>g	208
+opp a>>h	209
+opp b>>a	20A
+opp b>>c	20B
+opp b>>d	20C
+opp b>>e	20D
+opp b>>f	20E
+opp b>>g	20F
+opp b>>h	210
+opp c>>a	211
+opp c>>b	212
+opp c>>d	213
+opp c>>e	214
+opp c>>f	215
+opp c>>g	216
+opp c>>h	217
+opp d>>a	218
+opp d>>b	219
+opp d>>c	21A
+opp d>>e	21B
+opp d>>f	21C
+opp d>>g	21D
+opp d>>h	21E
+opp e>>a	21F
+opp e>>b	220
+opp e>>c	221
+opp e>>d	222
+opp e>>f	223
+opp e>>g	224
+opp e>>h	225
+opp f>>a	226
+opp f>>b	227
+opp f>>c	228
+opp f>>d	229
+opp f>>e	22A
+opp f>>g	22B
+opp f>>h	22C
+opp g>>a	22D
+opp g>>b	22E
+opp g>>c	22F
+opp g>>d	230
+opp g>>e	231
+opp g>>f	232
+opp g>>h	233
+opp h>>a	234
+opp h>>b	235
+opp h>>c	236
+opp h>>d	237
+opp h>>e	238
+opp h>>f	239
+opp h>>g	23A
+opp a<<b	23B
+opp a<<c	23C
+opp a<<d	23D
+opp a<<e	23E
+opp a<<f	23F
+opp a<<g	240
+opp a<<h	241
+opp b<<a	242
+opp b<<c	243
+opp b<<d	244
+opp b<<e	245
+opp b<<f	246
+opp b<<g	247
+opp b<<h	248
+opp c<<a	249
+opp c<<b	24A
+opp c<<d	24B
+opp c<<e	24C
+opp c<<f	24D
+opp c<<g	24E
+opp c<<h	24F
+opp d<<a	250
+opp d<<b	251
+opp d<<c	252
+opp d<<e	253
+opp d<<f	254
+opp d<<g	255
+opp d<<h	256
+opp e<<a	257
+opp e<<b	258
+opp e<<c	259
+opp e<<d	25A
+opp e<<f	25B
+opp e<<g	25C
+opp e<<h	25D
+opp f<<a	25E
+opp f<<b	25F
+opp f<<c	260
+opp f<<d	261
+opp f<<e	262
+opp f<<g	263
+opp f<<h	264
+opp g<<a	265
+opp g<<b	266
+opp g<<c	267
+opp g<<d	268
+opp g<<e	269
+opp g<<f	26A
+opp g<<h	26B
+opp h<<a	26C
+opp h<<b	26D
+opp h<<c	26E
+opp h<<d	26F
+opp h<<e	270
+opp h<<f	271
+opp h<<g	272
+opp a>>>b	273
+opp a>>>c	274
+opp a>>>d	275
+opp a>>>e	276
+opp a>>>f	277
+opp a>>>g	278
+opp a>>>h	279
+opp b>>>a	27A
+opp b>>>c	27B
+opp b>>>d	27C
+opp b>>>e	27D
+opp b>>>f	27E
+opp b>>>g	27F
+opp b>>>h	280
+opp c>>>a	281
+opp c>>>b	282
+opp c>>>d	283
+opp c>>>e	284
+opp c>>>f	285
+opp c>>>g	286
+opp c>>>h	287
+opp d>>>a	288
+opp d>>>b	289
+opp d>>>c	28A
+opp d>>>e	28B
+opp d>>>f	28C
+opp d>>>g	28D
+opp d>>>h	28E
+opp e>>>a	28F
+opp e>>>b	290
+opp e>>>c	291
+opp e>>>d	292
+opp e>>>f	293
+opp e>>>g	294
+opp e>>>h	295
+opp f>>>a	296
+opp f>>>b	297
+opp f>>>c	298
+opp f>>>d	299
+opp f>>>e	29A
+opp f>>>g	29B
+opp f>>>h	29C
+opp g>>>a	29D
+opp g>>>b	29E
+opp g>>>c	29F
+opp g>>>d	2A0
+opp g>>>e	2A1
+opp g>>>f	2A2
+opp g>>>h	2A3
+opp h>>>a	2A4
+opp h>>>b	2A5
+opp h>>>c	2A6
+opp h>>>d	2A7
+opp h>>>e	2A8
+opp h>>>f	2A9
+opp h>>>g	2AA
+opp a*b	2AB
+opp a*c	2AC
+opp a*d	2AD
+opp a*e	2AE
+opp a*f	2AF
+opp a*g	2B0
+opp a*h	2B1
+opp b*a	2B2
+opp b*c	2B3
+opp b*d	2B4
+opp b*e	2B5
+opp b*f	2B6
+opp b*g	2B7
+opp b*h	2B8
+opp c*a	2B9
+opp c*b	2BA
+opp c*d	2BB
+opp c*e	2BC
+opp c*f	2BD
+opp c*g	2BE
+opp c*h	2BF
+opp d*a	2C0
+opp d*b	2C1
+opp d*c	2C2
+opp d*e	2C3
+opp d*f	2C4
+opp d*g	2C5
+opp d*h	2C6
+opp e*a	2C7
+opp e*b	2C8
+opp e*c	2C9
+opp e*d	2CA
+opp e*f	2CB
+opp e*g	2CC
+opp e*h	2CD
+opp f*a	2CE
+opp f*b	2CF
+opp f*c	2D0
+opp f*d	2D1
+opp f*e	2D2
+opp f*g	2D3
+opp f*h	2D4
+opp g*a	2D5
+opp g*b	2D6
+opp g*c	2D7
+opp g*d	2D8
+opp g*e	2D9
+opp g*f	2DA
+opp g*h	2DB
+opp h*a	2DC
+opp h*b	2DD
+opp h*c	2DE
+opp h*d	2DF
+opp h*e	2E0
+opp h*f	2E1
+opp h*g	2E2
+opp a/b	2E3
+opp a/c	2E4
+opp a/d	2E5
+opp a/e	2E6
+opp a/f	2E7
+opp a/g	2E8
+opp a/h	2E9
+opp b/a	2EA
+opp b/c	2EB
+opp b/d	2EC
+opp b/e	2ED
+opp b/f	2EE
+opp b/g	2EF
+opp b/h	2F0
+opp c/a	2F1
+opp c/b	2F2
+opp c/d	2F3
+opp c/e	2F4
+opp c/f	2F5
+opp c/g	2F6
+opp c/h	2F7
+opp d/a	2F8
+opp d/b	2F9
+opp d/c	2FA
+opp d/e	2FB
+opp d/f	2FC
+opp d/g	2FD
+opp d/h	2FE
+opp e/a	2FF
+opp e/b	300
+opp e/c	301
+opp e/d	302
+opp e/f	303
+opp e/g	304
+opp e/h	305
+opp f/a	306
+opp f/b	307
+opp f/c	308
+opp f/d	309
+opp f/e	30A
+opp f/g	30B
+opp f/h	30C
+opp g/a	30D
+opp g/b	30E
+opp g/c	30F
+opp g/d	310
+opp g/e	311
+opp g/f	312
+opp g/h	313
+opp h/a	314
+opp h/b	315
+opp h/c	316
+opp h/d	317
+opp h/e	318
+opp h/f	319
+opp h/g	31A
+load ram[a] b	31B
+load ram[a] c	31C
+load ram[a] d	31D
+load ram[a] e	31E
+load ram[a] f	31F
+load ram[a] g	320
+load ram[a] h	321
+load ram[b] a	322
+load ram[b] c	323
+load ram[b] d	324
+load ram[b] e	325
+load ram[b] f	326
+load ram[b] g	327
+load ram[b] h	328
+load ram[c] a	329
+load ram[c] b	32A
+load ram[c] d	32B
+load ram[c] e	32C
+load ram[c] f	32D
+load ram[c] g	32E
+load ram[c] h	32F
+load ram[d] a	330
+load ram[d] b	331
+load ram[d] c	332
+load ram[d] e	333
+load ram[d] f	334
+load ram[d] g	335
+load ram[d] h	336
+load ram[e] a	337
+load ram[e] b	338
+load ram[e] c	339
+load ram[e] d	33A
+load ram[e] f	33B
+load ram[e] g	33C
+load ram[e] h	33D
+load ram[f] a	33E
+load ram[f] b	33F
+load ram[f] c	340
+load ram[f] d	341
+load ram[f] e	342
+load ram[f] g	343
+load ram[f] h	344
+load ram[g] a	345
+load ram[g] b	346
+load ram[g] c	347
+load ram[g] d	348
+load ram[g] e	349
+load ram[g] f	34A
+load ram[g] h	34B
+load ram[h] a	34C
+load ram[h] b	34D
+load ram[h] c	34E
+load ram[h] d	34F
+load ram[h] e	350
+load ram[h] f	351
+load ram[h] g	352
+load rom a {number}	353
+load rom b {number}	354
+load rom c {number}	355
+load rom d {number}	356
+load rom e {number}	357
+load rom f {number}	358
+load rom g {number}	359
+load rom h {number}	35A
+load ram[{number}] a	35B
+load ram[{number}] b	35C
+load ram[{number}] c	35D
+load ram[{number}] d	35E
+load ram[{number}] e	35F
+load ram[{number}] f	360
+load ram[{number}] g	361
+load ram[{number}] h	362
+save a mar	363
+save b mar	364
+save c mar	365
+save d mar	366
+save e mar	367
+save f mar	368
+save g mar	369
+save h mar	36A
+save a ram[current]	36B
+save b ram[current]	36C
+save c ram[current]	36D
+save d ram[current]	36E
+save e ram[current]	36F
+save f ram[current]	370
+save g ram[current]	371
+save h ram[current]	372
+save a ram[b]	373
+save a ram[c]	374
+save a ram[d]	375
+save a ram[e]	376
+save a ram[f]	377
+save a ram[g]	378
+save a ram[h]	379
+save b ram[a]	37A
+save b ram[c]	37B
+save b ram[d]	37C
+save b ram[e]	37D
+save b ram[f]	37E
+save b ram[g]	37F
+save b ram[h]	380
+save c ram[a]	381
+save c ram[b]	382
+save c ram[d]	383
+save c ram[e]	384
+save c ram[f]	385
+save c ram[g]	386
+save c ram[h]	387
+save d ram[a]	388
+save d ram[b]	389
+save d ram[c]	38A
+save d ram[e]	38B
+save d ram[f]	38C
+save d ram[g]	38D
+save d ram[h]	38E
+save e ram[a]	38F
+save e ram[b]	390
+save e ram[c]	391
+save e ram[d]	392
+save e ram[f]	393
+save e ram[g]	394
+save e ram[h]	395
+save f ram[a]	396
+save f ram[b]	397
+save f ram[c]	398
+save f ram[d]	399
+save f ram[e]	39A
+save f ram[g]	39B
+save f ram[h]	39C
+save g ram[a]	39D
+save g ram[b]	39E
+save g ram[c]	39F
+save g ram[d]	3A0
+save g ram[e]	3A1
+save g ram[f]	3A2
+save g ram[h]	3A3
+save h ram[a]	3A4
+save h ram[b]	3A5
+save h ram[c]	3A6
+save h ram[d]	3A7
+save h ram[e]	3A8
+save h ram[f]	3A9
+save h ram[g]	3AA
+save a ram[{number}]	3AB
+save b ram[{number}]	3AC
+save c ram[{number}]	3AD
+save d ram[{number}]	3AE
+save e ram[{number}]	3AF
+save f ram[{number}]	3B0
+save g ram[{number}]	3B1
+save h ram[{number}]	3B2
+in a	3B3
+in b	3B4
+in c	3B5
+in d	3B6
+in e	3B7
+in f	3B8
+in g	3B9
+in h	3BA
+out a	3BB
+out b	3BC
+out c	3BD
+out d	3BE
+out e	3BF
+out f	3C0
+out g	3C1
+out h	3C2
+out {number}	3C3
+out ram[{number}]	3C4
+out ram[a]	3C5
+out ram[b]	3C6
+out ram[c]	3C7
+out ram[d]	3C8
+out ram[e]	3C9
+out ram[f]	3CA
+out ram[g]	3CB
+out ram[h]	3CC
+load stack a	3CD
+load stack b	3CE
+load stack c	3CF
+load stack d	3D0
+load stack e	3D1
+load stack f	3D2
+load stack g	3D3
+load stack h	3D4
+save a stack	3D5
+save b stack	3D6
+save c stack	3D7
+save d stack	3D8
+save e stack	3D9
+save f stack	3DA
+save g stack	3DB
+save h stack	3DC
+pop a	3DD
+pop b	3DE
+pop c	3DF
+pop d	3E0
+pop e	3E1
+pop f	3E2
+pop g	3E3
+pop h	3E4
+halt	3E5
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

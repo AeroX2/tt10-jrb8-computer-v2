@@ -1,12 +1,12 @@
 {
-  "name": "jrb8-compiler",
+  "name": "jrb16-compiler",
   "version": "1.0.0",
-  "description": "Compiler for JRB8 Computer",
+  "description": "Compiler for jrb16 Computer",
   "main": "dist/compiler.js",
   "scripts": {
     "test": "jest",
     "build": "tsc && npm run bundle",
-    "bundle": "esbuild web.ts --bundle --outfile=dist/bundle.js --global-name=jrb8Compiler --platform=browser",
+    "bundle": "esbuild web.ts --bundle --outfile=dist/bundle.js --global-name=jrb16Compiler --platform=browser",
     "start": "ts-node compiler.ts",
     "convert": "node scripts/convert_csv_to_ts.js",
     "dev": "npm run build && http-server ./dist -o -c-1",

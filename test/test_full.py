@@ -18,7 +18,7 @@ async def setup(dut):
     global RAM
     RAM = [0xFF] * 65536
 
-    computer = dut.tt_um_aerox2_jrb8_computer
+    computer = dut.tt_um_aerox2_jrb16_computer
     clk = computer.clk
     sclk = computer.uio_out[3]
 
@@ -107,7 +107,7 @@ async def run(dut, ROM, cycles, address_24bit=False, inputs=[]):
     computer, clk, sclk = await setup(dut)
 
     # Only for debugging
-    _computer = dut.tt_um_aerox2_jrb8_computer
+    _computer = dut.tt_um_aerox2_jrb16_computer
 
     computer.uio_in[7].value = address_24bit
 

@@ -16,8 +16,7 @@ module cu (
     output logic write_en,
     output logic highbits_we,
 
-    output logic [11:0] input_flags,
-    output logic [19:0] output_flags
+    output logic [FLAGS_LEN-1:0] flags
 );
 
   logic [26:0] cu_rom[1024];
@@ -41,22 +40,16 @@ module cu (
 
   state_t cu_state, cu_next_state;
 
+  logic alu_done_reg;
+
   logic [9:0] ir_reg;
   logic [22:0] pc_reg;
-
-  logic [26:0] flags;
-  wire halt = flags[HALT_BIT];
-  wire another_cycle = flags[AC_BIT];
+  logic [FLAGS_LEN-1:0] flags_reg;
 
   wire pcc = flags[PCC_BIT];
-  wire rom_or_ram_state_change = flags[PCC_BIT] ||
-                                 flags[RAMI_BIT] ||
-                                 flags[ROMO_BIT] ||
-                                 flags[RAMO_BIT];
-
   wire aluo = flags[ALUO_BIT];
-
-  logic alu_done_reg;
+  wire halt = flags[HALT_BIT];
+  wire another_cycle = flags[AC_BIT];
 
   always_ff @(posedge clk, posedge rst) begin
     if (rst) begin
@@ -70,7 +63,7 @@ module cu (
 
       alu_done_reg <= alu_done;
 
-      unique case (cu_state)
+      case (cu_state)
         UPDATE_IR: begin
           ir_reg <= irin;
         end
@@ -82,13 +75,15 @@ module cu (
           if (pcinflag) pc_reg <= pcin;
           else pc_reg <= pc_reg + 1;
         end
+        default begin
+          // No need to do anything here
+        end
       endcase
     end
   end
 
   always_comb begin
     alu_executing = 0;
-
     cu_next_state = UPDATE_IR;
 
     unique case (cu_state)
@@ -126,26 +121,23 @@ module cu (
   end
 
   always_comb begin
-    case (cu_state)
-      // Turn on PCC and ROMO
+    unique case (cu_state)
       UPDATE_IR: begin
-        flags = UPDATE_IR_FLAGS;
+        // Turn on PCC and ROMO
+        flags_reg = UPDATE_IR_FLAGS;
       end
       FLAGS_1, FLAGS_1_ALU, FLAGS_1_EVENTS: begin
-        flags = cu_rom[ir_reg];
+        flags_reg = cu_rom[ir_reg];
       end
       FLAGS_2, FLAGS_2_ALU, FLAGS_2_EVENTS: begin
-        flags = cu_rom_2[ir_reg];
+        flags_reg = cu_rom_2[ir_reg];
       end
-
-      default: flags = 0;
     endcase
   end
 
-  assign input_flags = flags[11:0];
-  assign output_flags = flags[26:12];
-
   assign pc = pc_reg;
+  assign flags = flags_reg;
+
   assign write_en = cu_state == FLAGS_1_EVENTS || cu_state == FLAGS_2_EVENTS;
   assign highbits_we = cu_state == FLAGS_1_EVENTS;
   assign ir = ir_reg;

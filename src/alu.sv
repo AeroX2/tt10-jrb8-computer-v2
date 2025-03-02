@@ -9,7 +9,7 @@ module alu (
     // Inputs
     input [15:0] a,
     input [15:0] b,
-    input [7:0] ir,
+    input [9:0] ir,
     input oe,
     input carryin,
 
@@ -17,19 +17,17 @@ module alu (
     output logic carryout,
     output [15:0] aluout,
     output overout,
-    output cmpo,
-    output enable_flags
+    output cmpo
 );
-  localparam CLR_CMP_INS = 'h50;
-  // TODO(This needs to be filled in)
-  localparam FLAGS_OFF_INS = 'h54;
-  localparam FLAGS_ON_INS = 'h53;
-  localparam CARRY_OFF_INS = 'h51;
-  localparam CARRY_ON_INS = 'h52;
-  localparam SIGN_OFF_INS = 'h53;
-  localparam SIGN_ON_INS = 'h54;
+  localparam CLR_CMP_INS = 'hB9;
+  localparam FLAGS_OFF_INS = 'hBA;
+  localparam FLAGS_ON_INS = 'hBB;
+  localparam CARRY_OFF_INS = 'hBC;
+  localparam CARRY_ON_INS = 'hBD;
+  localparam SIGN_OFF_INS = 'hBE;
+  localparam SIGN_ON_INS = 'hBF;
 
-  reg [10:0] alu_rom[0:1024];
+  reg [10:0] alu_rom[1024];
   initial begin
     $readmemh("../rom/alu_rom.mem", alu_rom);
   end
@@ -153,6 +151,7 @@ module alu (
           // TODO: Division
         end
         INVERT: begin
+          muxoutput <= muxoutput ^ {16{io}};
         end
     endcase
     end
@@ -183,6 +182,7 @@ module alu (
       XORZ: begin
         unique case (cselect)
           0: next_state = SUM;
+          1: next_state = AND;
           2: next_state = XOR;
           3: next_state = LEFT_SHIFT;
           4: next_state = RIGHT_SHIFT;
@@ -193,7 +193,16 @@ module alu (
       SUM: begin
         next_state = INVERT;
       end
+      AND: begin
+        next_state = INVERT;
+      end
       XOR: begin
+        next_state = INVERT;
+      end
+      LEFT_SHIFT: begin
+        next_state = INVERT;
+      end
+      RIGHT_SHIFT: begin
         next_state = INVERT;
       end
       MULT: begin
@@ -209,9 +218,8 @@ module alu (
   end
 
   assign aluout = oe ? muxoutput : 0;
-  // TODO: Is enable_flags == cmpo?
-  assign cmpo = (1 || ir == CLR_CMP_INS) && state == INVERT;
-  assign enable_flags = flags_mode;
+  // TODO: This 1 needs to be replaced
+  assign cmpo = (1 || ir == CLR_CMP_INS) && flags_mode && state == INVERT;
 
   assign carryout = cselect == 0 ? (((ia | ib) & po) ? !full_sum[16] : full_sum[16]) : 0;
   assign overout = ((~muxoutput[15]) & xora[15] & xorb[15])

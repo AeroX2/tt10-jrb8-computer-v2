@@ -1,3 +1,5 @@
+parameter FLAGS_LEN = 28;
+
 // Individual flag bit positions
 parameter AI_BIT = 0;
 parameter BI_BIT = 1;
