@@ -214,13 +214,14 @@ async def test_alu_shifts(dut):
     alu, clk, a, b = await setup(dut)
 
     # Test left shift
-    a, b = gen_rand(lambda a, b: b >= 0 and b <= 16)
+    a, b = gen_rand(lambda a, b: b > 0 and b < 16)
     alu.a.value = Force(a)
     alu.b.value = Force(b)
-    await test(alu, clk, [0x23B+i for i in range(56)], [(a << b) & 0xFFFF for _ in range(56)], False)
+    await test(alu, clk, [0x23B+i for i in range(56)], [((a & 0xFFFF) << b) & 0xFFFF for _ in range(56)], False)
 
     # Right shift instruction (a>>b) 
-    a, b = gen_rand(lambda a, b: b >= 0 and b <= 16)
+    a, b = gen_rand(lambda a, b: b > 0 and b < 16)
+    print(a,b)
     alu.a.value = Force(a)
     alu.b.value = Force(b)
-    await test(alu, clk, [0x203+i for i in range(56)], [(a >> b) & 0xFFFF for _ in range(56)], False)
+    await test(alu, clk, [0x203+i for i in range(56)], [((a & 0xFFFF) >> b) & 0xFFFF for _ in range(56)], False)

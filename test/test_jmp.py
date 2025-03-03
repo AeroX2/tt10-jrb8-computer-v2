@@ -21,22 +21,16 @@ async def setup(dut):
 
 
 async def jmp_tick(jmp, clk):
-    pc_value_high = random.randint(0, 255)
-    jmp.highbits_we.value = Force(1)
-    jmp.databus.value = Force(pc_value_high)
+    pc_value = random.randint(0,65536)
+    jmp.databus.value = Force(pc_value)
     await ClockCycles(clk, 1)
     await Timer(1)
     assert jmp.pcoe.value == 0
-    assert jmp.highbits.value == pc_value_high
-
-    pc_value_low = random.randint(0, 255)
-    jmp.highbits_we.value = Force(0)
-    jmp.databus.value = Force(pc_value_low)
 
     jmp.oe.value = Force(1)
     await ClockCycles(clk, 1)
 
-    return pc_value_high << 8 | pc_value_low
+    return pc_value
 
 
 @cocotb.test()
@@ -55,7 +49,7 @@ async def test_jmp_jumps_correctly(dut):
     jmp, clk = await setup(dut)
 
     # No condition, always jump
-    jmp.cins.value = Force(0x30)
+    jmp.ir.value = Force(0x99)
     pc_out = await jmp_tick(jmp, clk)
     assert jmp.pcoe.value == 1
     assert jmp.pcout.value == pc_out
@@ -66,25 +60,133 @@ async def test_jmp_conditions(dut):
     jmp, clk = await setup(dut)
 
     # = condition
-    jmp.cins.value = Force(0x31)
-    jmp.zflag.value = Force(1)
-    await ClockCycles(clk, 1)
-    assert jmp.pcoe.value == 1
-    jmp.cins.value = Force(0x31)
+    jmp.ir.value = Force(0x9A)
     jmp.zflag.value = Force(0)
     await ClockCycles(clk, 1)
     assert jmp.pcoe.value == 0
+    jmp.zflag.value = Force(1)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 1
 
     # != condition
-    jmp.cins.value = Force(0x32)
+    jmp.ir.value = Force(0x9B)
     jmp.zflag.value = Force(1)
     await ClockCycles(clk, 1)
     assert jmp.pcoe.value == 0
-    jmp.cins.value = Force(0x32)
     jmp.zflag.value = Force(0)
     await ClockCycles(clk, 1)
     assert jmp.pcoe.value == 1
 
-    # TODO: Realistically we should also test all the other conditions but
-    # its a little complex and this should hopefully be tested by the
-    # full integration test
+@cocotb.test()
+async def test_jmp_less_conditions(dut):
+    jmp, clk = await setup(dut)
+
+    # < condition
+    jmp.ir.value = Force(0x9C)
+    jmp.cflag.value = Force(0)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 0
+    jmp.cflag.value = Force(1)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 1
+
+    # <= condition
+    jmp.ir.value = Force(0x9D)
+    jmp.cflag.value = Force(0)
+    jmp.zflag.value = Force(0)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 0
+    jmp.cflag.value = Force(1)
+    jmp.zflag.value = Force(0)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 1
+    jmp.cflag.value = Force(0)
+    jmp.zflag.value = Force(1)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 1
+
+@cocotb.test()
+async def test_jmp_greater_conditions(dut):
+    jmp, clk = await setup(dut)
+
+    # > condition
+    jmp.ir.value = Force(0x9E)
+    jmp.cflag.value = Force(1)
+    jmp.zflag.value = Force(0)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 0
+    jmp.cflag.value = Force(0)
+    jmp.zflag.value = Force(1)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 0
+    jmp.cflag.value = Force(0)
+    jmp.zflag.value = Force(0)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 1
+
+    # >= condition
+    jmp.ir.value = Force(0x9F)
+    jmp.cflag.value = Force(1)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 0
+    jmp.cflag.value = Force(0)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 1
+
+@cocotb.test()
+async def test_jmp_signed_conditions(dut):
+    jmp, clk = await setup(dut)
+
+    # Signed < condition
+    jmp.ir.value = Force(0xA0)
+    jmp.oflag.value = Force(0)
+    jmp.sflag.value = Force(0)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 0
+    jmp.oflag.value = Force(1)
+    jmp.sflag.value = Force(0)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 1
+
+    # Signed <= condition
+    jmp.ir.value = Force(0xA1)
+    jmp.oflag.value = Force(0)
+    jmp.sflag.value = Force(0)
+    jmp.zflag.value = Force(0)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 0
+    jmp.oflag.value = Force(1)
+    jmp.sflag.value = Force(0)
+    jmp.zflag.value = Force(0)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 1
+    jmp.oflag.value = Force(0)
+    jmp.sflag.value = Force(0)
+    jmp.zflag.value = Force(1)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 1
+
+    # Signed > condition
+    jmp.ir.value = Force(0xA2)
+    jmp.oflag.value = Force(1)
+    jmp.sflag.value = Force(0)
+    jmp.zflag.value = Force(0)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 0
+    jmp.oflag.value = Force(0)
+    jmp.sflag.value = Force(0)
+    jmp.zflag.value = Force(0)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 1
+
+    # Signed >= condition
+    jmp.ir.value = Force(0xA3)
+    jmp.oflag.value = Force(1)
+    jmp.sflag.value = Force(0)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 0
+    jmp.oflag.value = Force(0)
+    jmp.sflag.value = Force(0)
+    await ClockCycles(clk, 1)
+    assert jmp.pcoe.value == 1
+

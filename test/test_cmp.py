@@ -52,6 +52,6 @@ async def test_cmp_values_set(dut):
     await ClockCycles(clk, 2)
     assert cmp.zflag.value == 1
 
-    cmp.cmpin.value = Force(random.randint(-127, -1))
+    cmp.cmpin.value = Force(random.randint(-32768, -1))
     await ClockCycles(clk, 2)
     assert cmp.sflag.value == 1

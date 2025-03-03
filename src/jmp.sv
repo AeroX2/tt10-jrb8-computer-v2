@@ -11,7 +11,6 @@ module jmp (
     input cflag,
     input sflag,
     input oe,
-    input highbits_we,
     output pcoe,
     output [22:0] pcout
 );
@@ -57,17 +56,11 @@ module jmp (
   };
   wire [3:0] sel = val[3:0];
 
-  assign pcoe = oe ? flags[sel] : 0;
-
-  reg [15:0] highbits;
-  always_ff @(posedge clk, posedge rst) begin
-    if (rst) highbits <= 0;
-    else if (highbits_we) highbits <= databus;
-  end
-
-  wire [22:0] address = {highbits, databus};
+  wire [22:0] address = {pcin[22:17], databus};
   wire [22:0] relative_pc_address = pcin + address;
 
   wire [22:0] muxoutput = val[4] ? relative_pc_address : address;
+
+  assign pcoe = oe ? flags[sel] : 0;
   assign pcout = pcoe ? muxoutput : 0;
 endmodule

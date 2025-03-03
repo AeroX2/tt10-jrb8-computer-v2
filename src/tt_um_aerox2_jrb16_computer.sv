@@ -51,10 +51,10 @@ module tt_um_aerox2_jrb16_computer (
   qspi qspi_rom_module (
       .clk(clk),
       .rst(rst),
-      .start(1),
-      .write(0),
-      .address(pc),
-      .data_in(23'b0),
+      .start(1'b1),
+      .write(1'b0),
+      .address({1'b1,pc}),
+      .data_in(32'b0),
       .data_out(rom_data),
       .busy(busy_rom),
       .sclk(sclk),
@@ -78,7 +78,6 @@ module tt_um_aerox2_jrb16_computer (
   //     .io_in(qspi_io_in)
   // );
 
-  wire highbits_we;
   wire pcinflag;
   wire [22:0] pc;
   wire [22:0] pcin;
@@ -91,7 +90,6 @@ module tt_um_aerox2_jrb16_computer (
   cu cu_module (
       .clk(clk),
       .rst(rst),
-      .highbits_we(highbits_we),
       .write_en(write_en),
       .alu_executing(alu_executing),
       .alu_done(alu_done),
@@ -124,7 +122,7 @@ module tt_um_aerox2_jrb16_computer (
 
     .rom(rom_data[25:10]),
     // .ram(ram_data[]),
-    .ram(1),
+    .ram(16'b0),
     .aluout(aluout),
     .databus(databus),
 
@@ -196,7 +194,6 @@ module tt_um_aerox2_jrb16_computer (
       .sflag(sflag),
       .pcoe(pcinflag),
       .pcout(pcin),
-      .oe(jmpo),
-      .highbits_we(highbits_we)
+      .oe(jmpo)
   );
 endmodule

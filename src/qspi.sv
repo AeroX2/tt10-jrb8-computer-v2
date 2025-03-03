@@ -31,6 +31,7 @@ module qspi (
     IDLE,
     SEND_COMMAND,
     SEND_ADDRESS,
+    DUMMY,
     SEND_DATA,
     RECEIVE_DATA
   } state_t;
@@ -55,19 +56,14 @@ module qspi (
       unique case (qspi_state)
         IDLE: begin
           sclk_reg <= 0;
-          shift_counter <= 0;
-
-          if (start) begin
-            sclk_reg <= 0;
-            shift_counter <= 7;
-          end
+          shift_counter <= 7; // 8 bits of instructions
         end
         SEND_COMMAND: begin
           sclk_reg <= ~sclk_reg;
           if (sclk_reg) begin
             shift_counter <= shift_counter - 1;
             if (shift_counter == 0) begin
-              shift_counter <= 23;
+              shift_counter <= 7; // 8 * 4 bits of the address
             end
           end
         end
@@ -76,7 +72,16 @@ module qspi (
           if (sclk_reg) begin
             shift_counter <= shift_counter - 1;
             if (shift_counter == 0) begin
-              shift_counter <= 7;
+              shift_counter <= 3; // 4 clock cycles of dummy
+            end
+          end
+        end
+        DUMMY: begin
+          sclk_reg <= ~sclk_reg;
+          if (sclk_reg) begin
+            shift_counter <= shift_counter - 1;
+            if (shift_counter == 0) begin
+              shift_counter <= 7; // 8 * 4 bits of data
             end
           end
         end
@@ -104,7 +109,7 @@ module qspi (
 
     unique case (qspi_state)
       IDLE: begin
-        if (write || !write) qspi_next_state = SEND_COMMAND;
+        if (start) qspi_next_state = SEND_COMMAND;
         else qspi_next_state = IDLE;
       end
       SEND_COMMAND: begin
@@ -119,8 +124,12 @@ module qspi (
         qspi_out_reg = {8'b0, address};
         if ((shift_counter == 0 && sclk)) begin
           if (write) qspi_next_state = SEND_DATA;
-          else qspi_next_state = RECEIVE_DATA;
+          else qspi_next_state = DUMMY;
         end else qspi_next_state = SEND_ADDRESS;
+      end
+      DUMMY: begin
+        if ((shift_counter == 0 && sclk)) qspi_next_state = RECEIVE_DATA;
+        else qspi_next_state = DUMMY;
       end
       SEND_DATA: begin
         qspi_out_reg = data_in;

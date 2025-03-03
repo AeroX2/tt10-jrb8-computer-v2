@@ -5,7 +5,7 @@ import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
 
-# from test_cmp import *
+from test_cmp import *
 from test_alu import *
-# from test_jmp import *
+from test_jmp import *
 # from test_qspi import *

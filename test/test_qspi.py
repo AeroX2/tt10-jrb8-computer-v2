@@ -14,7 +14,7 @@ QUAD_READ_COMMAND = 0xEB
 QUAD_WRITE_COMMAND = 0x32
 
 async def setup(dut):
-    qspi = dut.tt_um_aerox2_jrb16_computer.qspi_module
+    qspi = dut.tt_um_aerox2_jrb16_computer.qspi_rom_module
     clk = qspi.clk
 
     qspi.start.value = Force(0)
@@ -25,9 +25,9 @@ async def setup(dut):
     clock = Clock(clk, 10, units="us")
     cocotb.start_soon(clock.start())
 
-    qspi.rst.value = 1
+    qspi.rst.value = Force(1)
     await Timer(1)
-    qspi.rst.value = 0
+    qspi.rst.value = Force(0)
     await Timer(1)
 
     return qspi, clk
@@ -60,9 +60,9 @@ async def test_qspi_read(dut):
 
     # Verify QUAD READ command
     output = 0
-    for i in range(2):  # 8 bits / 4 bits per cycle = 2 cycles
+    for i in range(8):
         await RisingEdge(qspi.sclk)
-        output = (output << 4) | qspi.io_out.value.integer
+        output = (output << 1) | qspi.io_out[0].value.integer
     assert output == QUAD_READ_COMMAND
 
     await FallingEdge(qspi.sclk)
@@ -70,7 +70,7 @@ async def test_qspi_read(dut):
 
     # Verify address
     output = 0
-    for i in range(6):  # 24 bits / 4 bits per cycle = 6 cycles
+    for i in range(8):
         await RisingEdge(qspi.sclk)
         output = (output << 4) | qspi.io_out.value.integer
     assert output == address_value
